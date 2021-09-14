@@ -42,8 +42,7 @@ const Employee = require('./lib/employee');
 // default action is view departments
 let action = 'view all departments';
 
-
-// cycle through questions for each type of employee until user selects 'no more employees'
+// response to action selected by user
 function newAction(action) {
 
     switch (action) {
@@ -56,6 +55,7 @@ function newAction(action) {
                     id,
                     name
                     );
+            // how is the class being used here?
 
                 sql = `INSERT INTO department (id, department_name)
                         VALUES (${id}, "${name}");`;
