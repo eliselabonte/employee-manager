@@ -185,7 +185,18 @@ function newAction(action) {
             break;
     };
 
-    inquirer.prompt(companyPrompt)
-}
+    promptQuestions();
+};
 
-inquirer.prompt(companyPrompt).then(newAction(answer));
+function promptQuestions()  {
+// ask the first question, then use that answer to execute the 
+inquirer
+    .prompt(companyPrompt)
+    .then((answer) => newAction(answer))
+    .catch((err) => console.error(err));
+
+};
+
+console.log('THIS IS STILL WORKING');
+
+promptQuestions();
