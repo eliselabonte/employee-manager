@@ -21,7 +21,7 @@ const departmentPrompts = [
 const rolePrompts = [
     {
         type: 'input',
-        name: 'roIdid',
+        name: 'roleId',
         message: 'what is the role id?',
     },
     {
@@ -40,7 +40,12 @@ const rolePrompts = [
         message: 'what is the id of the department that this role is under?',
     },];
 
-const employeePrompts = [
+    const employeePrompts = [
+    {
+        type: 'input',
+        name: 'employeeId',
+        message: 'what is the employee\'s id?',
+    },
     {
         type: 'input',
         name: 'employeeFirstName',
@@ -53,13 +58,13 @@ const employeePrompts = [
     },
     {
         type: 'input',
-        name: 'employeeId',
-        message: 'what is the employee\'s id?',
+        name: 'employeeManager',
+        message: 'what is the id of the employee\'s manager?',
     },
     {
         type: 'input',
-        name: 'employeeManager',
-        message: 'what is the id of the employee\'s manager?',
+        name: 'employeeRole',
+        message: 'what is the employee\'s role id?',
     },
 ];
 
@@ -68,6 +73,7 @@ const updateRolePrompts = [
         type: 'list',
         name: 'selectRole',
         message: 'what role would you like to change?',
+        // need method to insert role titles
         choices: 'insert role titles here',
     },
     {
@@ -77,7 +83,9 @@ const updateRolePrompts = [
         choices: ['role title', 'role id', 'role salary', 'department']
     }
     // from here select proper question from rolePrompts
-]
+];
+
+module.exports = [companyPrompt, departmentPrompts, rolePrompts, employeePrompts, updateRolePrompts]
 
 // view departments: display departments.db
 // view roles: display roles.db
