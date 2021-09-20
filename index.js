@@ -2,20 +2,15 @@
 const mysql = require('mysql2');
 // Import inquirer
 const inquirer = require('inquirer');
-// import questions for inquirer
-const prompts = require('./prompts');
+
+const ctable = require('console.table');
 
 // environmental variables
 require('dotenv').config();
 const environment = process.env;
 
-const PORT = environment.PORT || 3001;
-
-// const app = express();
-
-// // I don't think I need express for this project
-// app.use(express.urlencoded({ extended: false }));
-// app.use(express.json());
+// deconstruct exports from prompts
+const { companyPrompt, departmentPrompts, rolePrompts, employeePrompts, updateRolePrompts } = require('./prompts');
 
 // Connect to database
 const db = mysql.createConnection(
@@ -23,82 +18,56 @@ const db = mysql.createConnection(
     host: environment.DB_HOST,
     // MySQL username,
     user: environment.DB_USER,
-    // TODO: Add MySQL password here
     password: environment.DB_PASSWORD,
-    database: 'employees_db'
+    database: 'company_db'
     },
-    console.log(`Connected to the employees_db database.`)
+    console.log(`Connected to the company_db database.`)
 );
 
 let sql;
-
-// deconstruct exports from prompts
-const { companyPrompt, departmentPrompts, rolePrompts, employeePrompts, updateRolePrompts } = prompts;
-
-const Department = require('./lib/department');
-const Role = require('./lib/roles');
-const Employee = require('./lib/employee');
 
 // default action is view departments
 let action = 'view all departments';
 
 // response to action selected by user
 function newAction(action) {
-
+    console.log('action', action);
     switch (action) {
         case 'add a department':
             inquirer.prompt(departmentPrompts).then((answers) => {
-                const id = answers.deptId;
                 const name = answers.deptName;
 
-                const dept = new Department(
-                    id,
-                    name
-                    );
-            // how is the class being used here?
-
-                sql = `INSERT INTO department (id, department_name)
-                        VALUES (${id}, "${name}");`;
+                sql = `INSERT INTO department (department_name)
+                        VALUES ("${name}");`;
 
                 db.query(sql, (err, rows) => {
                     if (err) {
-                        res.status(500).json({ error: err.message });
-                        return;
+                        throw err;
                     }
-                    res.json({
-                        message: 'successfully added department',
-                        data: rows
-                    });
+                    console.log('successfully added dept')
+
+                    promptQuestions();
                 });
             });
             break;
 
         case 'add a role':
             inquirer.prompt(rolePrompts).then((answers) => {
-                const id = answers.roleId;
                 const title = answers.roleTitle;
                 const salary = answers.roleSalary;
-                const dept = answers.roleDept;
+                const dept = 4;
             
-                const role = new Role(
-                    id,
-                    title,
-                    salary,
-                    dept
-                    );
 
-                    sql = `INSERT INTO roles (id, title, salary, department_id)
-                    VALUES (${id}, "${title}", ${salary}, ${dept});`;
+                    sql = `INSERT INTO roles (title, salary, department_id)
+                    VALUES ("${title}", ${salary}, ${dept});`;
 
-                db.query(sql, (err, rows) => {
+                db.query(sql, (err) => {
                     if (err) {
-                        res.status(500).json({ error: err.message });
-                        return;
-                    }
-                    res.json({
-                        message: 'successfully added role',
-                        data: rows
-                    });
+                        throw err;
+                    };
+                    console.log('successfully added role');
+
+                    promptQuestions();
                 });
             });
             break;
@@ -106,97 +75,113 @@ function newAction(action) {
         case 'add an employee':
             inquirer.prompt(employeePrompts).then((answers) => {
 
-                const id = answers.employeeId;
                 const firstName = answers.employeeFirstName;
                 const lastName = answers.employeeLastName;
                 const managerId = answers.employeeManager;
                 const roleId = answers.employeeRole;
 
-                const employee = new Employee(
-                    id,
-                    firstName,
-                    lastName,
-                    managerId,
-                    roleId
-                    );
-
-                sql = `INSERT INTO employee (id, first_name, last_name, manager_id, role_id)
-                    VALUES (${id}, "${firstName}", "${lastName}", ${managerId}, ${roleId});`;
+                sql = `INSERT INTO employee (first_name, last_name, manager_id, role_id)
+                    VALUES ("${firstName}", "${lastName}", ${managerId}, ${roleId});`;
 
                 db.query(sql, (err, rows) => {
                     if (err) {
-                        res.status(500).json({ error: err.message });
-                        return;
-                    }
-                    res.json({
-                        message: 'successfully added role',
-                        data: rows
-                    });
+                        throw err
+                    };
+                    console.log('successfully added employee');
+
+                    promptQuestions();
+                    
                 });
             });
             break;
 
         case 'update an employee role':
-            inquirer.prompt(updateRolePrompts).then((answers) =>    {
 
-            })
+            const getRoles = () =>  {
+                return new Promise((resolve)  =>  {
+                    sql = `SELECT * FROM employee`
+                    db.query(sql, (err, data) => {
+                        if (err) {
+                            throw err;
+                        };
+                        const formatted = data.map((employee) => {
+                            return `${employee.first_name} ${employee.last_name}`
+                        });
+        
+                        resolve(formatted);
+                    })        
+                })
+            };
+
+            inquirer.prompt([
+                {
+                    name: 'asyncChoice',
+                    type: 'list',
+                    message: 'choose one',
+                    choices: async () => {
+                        console.log('retrieving data');
+                        const roles = await getRoles();
+                        return roles;
+                    }
+                }
+            ]);
+
+            promptQuestions();
+                
             break;
 
         case 'view all departments':
-            sql = `DESCRIBE department`;
-
-            db.query(sql, (err, rows) => {
+            sql = `SELECT * FROM department`;
+            db.query(sql, (err, data) => {
                     if (err) {
-                        res.status(500).json({ error: err.message });
-                        return;
-                    }
-                    res.json({
-                        data: rows
-                    });
+                        throw err;
+                    };
+                    console.log('DEPARTMENT');
+                    console.table(data);
+                    promptQuestions();
                 });
             break;
 
         case 'view all roles':
-            sql = `DESCRIBE roles`;
+            sql = `SELECT * FROM roles`;
 
-            db.query(sql, (err, rows) => {
+            db.query(sql, (err, data) => {
                     if (err) {
-                        res.status(500).json({ error: err.message });
-                        return;
+                        throw err;
                     }
-                    res.json({
-                        data: rows
-                    });
+                    console.log('');
+                    console.log('ROLES');
+                    console.table(data);
+                    promptQuestions()
                 });
             break;
 
         case 'view all employees':
-            sql = `DESCRIBE employee`;
+            sql = `SELECT * FROM employee`;
 
-            db.query(sql, (err, rows) => {
+            db.query(sql, (err, data) => {
                     if (err) {
-                        res.status(500).json({ error: err.message });
-                        return;
+                        throw err
                     }
-                    res.json({
-                        data: rows
-                    });
+                    console.log('');
+                    console.log('EMPLOYEE');
+                    console.table(data);
+                    promptQuestions()
                 });
             break;
     };
 
-    promptQuestions();
 };
 
 function promptQuestions()  {
 // ask the first question, then use that answer to execute the 
 inquirer
     .prompt(companyPrompt)
-    .then((answer) => newAction(answer))
+    .then((answer) => {
+        // console.log(answer.actionSelect);
+        newAction(answer.actionSelect)})
     .catch((err) => console.error(err));
-
 };
 
-console.log('THIS IS STILL WORKING');
 
 promptQuestions();

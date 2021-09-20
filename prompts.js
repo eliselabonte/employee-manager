@@ -11,19 +11,9 @@ const departmentPrompts = [
         type: 'input',
         name: 'deptName',
         message: 'what is the name of the department?',
-    },
-    {
-        type: 'input',
-        name: 'deptId',
-        message: 'what is the department id?',
-    },];
+    }];
 
 const rolePrompts = [
-    {
-        type: 'input',
-        name: 'roleId',
-        message: 'what is the role id?',
-    },
     {
         type: 'input',
         name: 'roleTitle',
@@ -33,19 +23,9 @@ const rolePrompts = [
         type: 'input',
         name: 'roleSalary',
         message: 'what is the salary for this role? (do not include symbols)',
-    },
-    {
-        type: 'input',
-        name: 'roleDept',
-        message: 'what is the id of the department that this role is under?',
     },];
 
     const employeePrompts = [
-    {
-        type: 'input',
-        name: 'employeeId',
-        message: 'what is the employee\'s id?',
-    },
     {
         type: 'input',
         name: 'employeeFirstName',
@@ -57,35 +37,36 @@ const rolePrompts = [
         message: 'what is the employee\'s last name?',
     },
     {
-        type: 'input',
-        name: 'employeeManager',
-        message: 'what is the id of the employee\'s manager?',
+        // type: 'list',
+        // name: 'employeeManager',
+        // message: 'who is the emplpoyee\'s manager?',
+        // choices:,
     },
     {
-        type: 'input',
-        name: 'employeeRole',
-        message: 'what is the employee\'s role id?',
+        // type: 'list',
+        // name: 'employeeRole',
+        // message: 'what is the employee\'s role?',
+        // choices:,
     },
 ];
 
 const updateRolePrompts = [
     {
         type: 'list',
-        name: 'selectRole',
-        message: 'what role would you like to change?',
+        name: 'updateEmployee',
+        message: 'what employee would you like to update?',
         // need method to insert role titles
-        choices: 'insert role titles here',
+        choices: 'insert employees here',
     },
     {
-        type: 'list',
-        name: 'selectUpdateInfo',
-        message: 'what information would you like to change?',
-        choices: ['role title', 'role id', 'role salary', 'department']
+        type: 'input',
+        name: 'updateRole',
+        message: 'what is the updated role id?'
     }
     // from here select proper question from rolePrompts
 ];
 
-module.exports = [companyPrompt, departmentPrompts, rolePrompts, employeePrompts, updateRolePrompts]
+module.exports = {companyPrompt, departmentPrompts, rolePrompts, employeePrompts, updateRolePrompts}
 
 // view departments: display departments.db
 // view roles: display roles.db
