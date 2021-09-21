@@ -12,7 +12,7 @@
 
   * [contributing](#contributing)
 
-  * [tests](#tests)
+  * [walkthrough-video](#video)
 
   ## description:
       Manage a department and employee databases from the command line.
@@ -29,5 +29,5 @@
   ## contributing:
       Elise
 
-  ## tests:
-      No tests are available at this time.
+  ## video:
+      

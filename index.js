@@ -56,7 +56,6 @@ function newAction(action) {
                 const title = answers.roleTitle;
                 const salary = answers.roleSalary;
                 const dept = answers.roleDept[0];
-                // console.log(dept)
             
 
                 sql = `INSERT INTO roles (title, salary, department_id)
@@ -79,7 +78,6 @@ function newAction(action) {
                 const name = answers.employeeName;
                 const managerId = answers.employeeManager[0];
                 const roleId = answers.employeeRole[0];
-                // console.log(manager)
 
                 sql = `INSERT INTO employee (employee_name, manager_id, role_id)
                     VALUES ("${name}", ${managerId}, ${roleId});`;
@@ -166,7 +164,6 @@ function promptQuestions()  {
 inquirer
     .prompt(companyPrompt)
     .then((answer) => {
-        // console.log(answer.actionSelect);
         newAction(answer.actionSelect)})
     .catch((err) => console.error(err));
 };
