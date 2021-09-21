@@ -58,11 +58,11 @@ const getManagers = () =>  {
             if (err) {
                 throw err;
             };
-            const formattedEmployees = data.map((employee) => {
+            const formattedManagers = data.map((employee) => {
                 return `${employee.id}, ${employee.employee_name}`
             });
         
-            resolve(formattedEmployees);
+            resolve(formattedManagers);
         })        
     })
 };
@@ -163,7 +163,7 @@ const employeePrompts = [
     {
         type: 'list',
         name: 'employeeRole',
-        message: 'what is the employee\'s role id?',
+        message: 'what is the employee\'s role?',
         choices: async () => {
             console.log('retrieving data');
             const roles = await getRoles();

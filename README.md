@@ -12,7 +12,7 @@
 
   * [contributing](#contributing)
 
-  * [walkthrough-video](#video)
+  * [walkthrough video](#video)
 
   ## description:
       Manage a department and employee databases from the command line.
@@ -30,4 +30,4 @@
       Elise
 
   ## video:
-      
+      Click [here](https://drive.google.com/file/d/1j0fGia2WYwJ2jprDkpFZ_LwXnPaUvrXX/view?usp=sharing) for a walkthrough video.
