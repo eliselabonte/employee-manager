@@ -55,11 +55,12 @@ function newAction(action) {
             inquirer.prompt(rolePrompts).then((answers) => {
                 const title = answers.roleTitle;
                 const salary = answers.roleSalary;
-                const dept = 4;
+                const dept = answers.roleDept[0];
+                // console.log(dept)
             
 
-                    sql = `INSERT INTO roles (title, salary, department_id)
-                    VALUES ("${title}", ${salary}, ${dept});`;
+                sql = `INSERT INTO roles (title, salary, department_id)
+                VALUES ("${title}", ${salary}, ${dept});`;
 
                 db.query(sql, (err) => {
                     if (err) {
@@ -75,13 +76,13 @@ function newAction(action) {
         case 'add an employee':
             inquirer.prompt(employeePrompts).then((answers) => {
 
-                const firstName = answers.employeeFirstName;
-                const lastName = answers.employeeLastName;
-                const managerId = answers.employeeManager;
-                const roleId = answers.employeeRole;
+                const name = answers.employeeName;
+                const managerId = answers.employeeManager[0];
+                const roleId = answers.employeeRole[0];
+                // console.log(manager)
 
-                sql = `INSERT INTO employee (first_name, last_name, manager_id, role_id)
-                    VALUES ("${firstName}", "${lastName}", ${managerId}, ${roleId});`;
+                sql = `INSERT INTO employee (employee_name, manager_id, role_id)
+                    VALUES ("${name}", ${managerId}, ${roleId});`;
 
                 db.query(sql, (err, rows) => {
                     if (err) {
@@ -95,38 +96,27 @@ function newAction(action) {
             });
             break;
 
-        case 'update an employee role':
+        case 'update an employee role':        
+            inquirer.prompt(updateRolePrompts).then((answers) => {
 
-            const getRoles = () =>  {
-                return new Promise((resolve)  =>  {
-                    sql = `SELECT * FROM employee`
-                    db.query(sql, (err, data) => {
-                        if (err) {
-                            throw err;
-                        };
-                        const formatted = data.map((employee) => {
-                            return `${employee.first_name} ${employee.last_name}`
-                        });
-        
-                        resolve(formatted);
-                    })        
-                })
-            };
+                const employeeName= answers.employeeChoice;
+                const roleId = answers.roleChoice[0];
 
-            inquirer.prompt([
-                {
-                    name: 'asyncChoice',
-                    type: 'list',
-                    message: 'choose one',
-                    choices: async () => {
-                        console.log('retrieving data');
-                        const roles = await getRoles();
-                        return roles;
-                    }
-                }
-            ]);
+                console.log(employeeName);
+                console.log(roleId);
 
-            promptQuestions();
+                sql = `UPDATE employee SET role_id=${roleId} WHERE employee_name='${employeeName}';`;
+
+                db.query(sql, (err, data) => {
+                    if (err) {
+                        throw err
+                    };
+                    console.log('successfully updated employee role');
+
+                    promptQuestions();
+                    
+                });
+            });
                 
             break;
 
@@ -163,8 +153,6 @@ function newAction(action) {
                     if (err) {
                         throw err
                     }
-                    console.log('');
-                    console.log('EMPLOYEE');
                     console.table(data);
                     promptQuestions()
                 });

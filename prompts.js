@@ -1,3 +1,111 @@
+const mysql = require('mysql2');
+
+const environment = process.env;
+
+const db = mysql.createConnection(
+    {
+    host: environment.DB_HOST,
+    // MySQL username,
+    user: environment.DB_USER,
+    password: environment.DB_PASSWORD,
+    database: 'company_db'
+    }
+);
+
+let sql;
+
+const getDepartments = () =>  {
+    
+    return new Promise((resolve)  =>  {
+        // sql = `SELECT * FROM roles INNER JOIN department ON department.id=roles.department_id;`
+        sql = `SELECT * FROM department`
+        
+        db.query(sql, (err, data) => {
+            if (err) {
+                throw err;
+            };
+            const formattedDepartments = data.map((department) => {
+                return `${department.id}, ${department.department_name}`
+            });
+
+            resolve(formattedDepartments);
+        })        
+    })
+};
+
+const getEmployees = () =>  {
+    
+    return new Promise((resolve)  =>  {
+        sql = `SELECT * FROM employee`
+        db.query(sql, (err, data) => {
+            if (err) {
+                throw err;
+            };
+            const formattedEmployees = data.map((employee) => {
+                return `${employee.employee_name}`
+            });
+
+            resolve(formattedEmployees);
+        })        
+    })
+};
+
+const getManagers = () =>  {
+    
+    return new Promise((resolve)  =>  {
+        sql = `SELECT * FROM employee WHERE role_id = 1`
+        db.query(sql, (err, data) => {
+            if (err) {
+                throw err;
+            };
+            const formattedEmployees = data.map((employee) => {
+                return `${employee.id}, ${employee.employee_name}`
+            });
+        
+            resolve(formattedEmployees);
+        })        
+    })
+};
+
+const getRoles = () =>  {
+    return new Promise((resolve)  =>  {
+        sql = `SELECT * FROM roles`
+        db.query(sql, (err, data) => {
+            if (err) {
+                throw err;
+            };
+            const formattedRoles = data.map((roles) => {
+                return `${roles.id}, ${roles.title}`
+            });
+        
+            resolve(formattedRoles);
+        })        
+    })
+};
+
+const updateRolePrompts = [
+    {
+        name: 'employeeChoice',
+        type: 'list',
+        message: 'Which employee would you like to update?',
+        choices: async () => {
+            console.log('retrieving data');
+            const employees = await getEmployees();
+            return employees;
+        }
+    },
+    {
+        name: 'roleChoice',
+        type: 'list',
+        message: 'What is the new role for this employee?',
+        choices: async () => {
+            console.log('retrieving data');
+            const roles = await getRoles();
+            return roles;
+        }
+    }
+];
+
 const companyPrompt = [
     {
         type: 'list',
@@ -23,47 +131,45 @@ const rolePrompts = [
         type: 'input',
         name: 'roleSalary',
         message: 'what is the salary for this role? (do not include symbols)',
-    },];
-
-    const employeePrompts = [
-    {
-        type: 'input',
-        name: 'employeeFirstName',
-        message: 'what is the employee\'s first name?',
     },
     {
-        type: 'input',
-        name: 'employeeLastName',
-        message: 'what is the employee\'s last name?',
-    },
-    {
-        // type: 'list',
-        // name: 'employeeManager',
-        // message: 'who is the emplpoyee\'s manager?',
-        // choices:,
-    },
-    {
-        // type: 'list',
-        // name: 'employeeRole',
-        // message: 'what is the employee\'s role?',
-        // choices:,
+        type: 'list',
+        name: 'roleDept',
+        message: 'what is the department is this role under?',
+        choices: async () => {
+            console.log('retrieving data');
+            const departments = await getDepartments();
+            return departments;
+        }
     },
 ];
 
-const updateRolePrompts = [
-    {
-        type: 'list',
-        name: 'updateEmployee',
-        message: 'what employee would you like to update?',
-        // need method to insert role titles
-        choices: 'insert employees here',
-    },
+const employeePrompts = [
     {
         type: 'input',
-        name: 'updateRole',
-        message: 'what is the updated role id?'
-    }
-    // from here select proper question from rolePrompts
+        name: 'employeeName',
+        message: 'what is the employee\'s name?',
+    },
+    {
+        type: 'list',
+        name: 'employeeManager',
+        message: 'who is the employee\'s manager?',
+        choices: async () => {
+            console.log('retrieving data');
+            const managers = await getManagers();
+            return managers;
+        }
+    },
+    {
+        type: 'list',
+        name: 'employeeRole',
+        message: 'what is the employee\'s role id?',
+        choices: async () => {
+            console.log('retrieving data');
+            const roles = await getRoles();
+            return roles;
+        }
+    },
 ];
 
 module.exports = {companyPrompt, departmentPrompts, rolePrompts, employeePrompts, updateRolePrompts}
